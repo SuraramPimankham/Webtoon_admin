@@ -7,30 +7,22 @@ function AddStory() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileId, setFileId] = useState('');
   const [title, setTitle] = useState('');
-  const [editableFileName, setEditableFileName] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [imageName, setImageName] = useState('');
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
-    setEditableFileName(file.name);
-  };
-
-  const handleIdChange = (event) => {
-    setFileId(event.target.value);
-  };
-
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value);
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !fileId || !title) {
+    if (!selectedFile || !fileId || !title || !category || !description || !imageName) {
       console.error('Please fill in all fields.');
       return;
     }
 
-    const storageRef = ref(storage, 'img_story/' + editableFileName);
+    const storageRef = ref(storage, `img_storys/${imageName}`);
 
     try {
       // Upload file
@@ -38,49 +30,67 @@ function AddStory() {
 
       // Get download URL
       const imageUrl = await getDownloadURL(snapshot.ref);
-      setImageUrl(imageUrl);
 
       // Save data to Firestore
-      const docRef = await addDoc(collection(db, 'storys'), {
+      await addDoc(collection(db, 'storys'), {
         id: fileId,
         title: title,
-        imageName: editableFileName,
+        category: category,
+        description: description,
         imageUrl: imageUrl
       });
 
-      console.log('Document written with ID: ', docRef.id);
+      console.log('Data uploaded successfully.');
     } catch (error) {
-      console.error('Error uploading file:', error);
-      return;
+      console.error('Error uploading data:', error);
     }
   };
 
   return (
-    <div>
-      <h2>AddStory Page</h2>
-      <input type="file" onChange={handleFileChange} />
+    <div className="container center">
       <div>
-        <h4>Selected File:</h4>
-        {selectedFile && <p>{editableFileName}</p>}
+        <input
+          type="file"
+          onChange={handleFileChange}
+        />
+        <button onClick={handleUpload}>Load</button>
       </div>
-      <div>
-        <label htmlFor="fileId">Image ID:</label>
-        <input type="text" id="fileId" value={fileId} onChange={handleIdChange} />
-      </div>
-      <div>
-        <label>Title:</label>
-        <input type="text" value={title} onChange={handleTitleChange} />
-      </div>
-      <div>
-        <label>Editable Image Name:</label>
-        <input type="text" value={editableFileName} onChange={(e) => setEditableFileName(e.target.value)} />
-      </div>
-      <div>
-        <button onClick={handleUpload}>Submit</button>
-      </div>
-      <div>
-        {imageUrl && <img src={imageUrl} alt="Uploaded" />}
-      </div>
+      {selectedFile ? (
+        <img src={URL.createObjectURL(selectedFile)} alt="Selected" />
+      ) : (
+        <p>No image selected.</p>
+      )}
+      <input
+        type="text"
+        placeholder="Image ID"
+        value={fileId}
+        onChange={(e) => setFileId(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Image Name"
+        value={imageName}
+        onChange={(e) => setImageName(e.target.value)}
+      />
+      <button onClick={handleUpload}>Submit</button>
     </div>
   );
 }
