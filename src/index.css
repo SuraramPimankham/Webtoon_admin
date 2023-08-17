@@ -45,48 +45,233 @@ a:hover {
   }
 }
 
-/* สร้าง Grid container และจัดกลางตามทั้งแนวตั้งและแนวนอน */
 .container.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: top;
+  min-height: 100vh;
+  padding-top: 20px; /* เพิ่มระยะขอบบน */
+  padding-bottom: 10px; /* เพิ่มระยะขอบล่าง */
+  padding-left: 20px; /* ไม่เพิ่มระยะขอบซ้าย */
+  padding-right: 20px; /* ไม่เพิ่มระยะขอบขวา */
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.input-row {
+  display: flex;
+  justify-content: center; /* จัดแนวตรงกลาง */
+  width: 100%;
+  margin-bottom: 20px; /* กำหนดระยะห่างของแถว */
+  flex: 1; /* ทำให้เต็มพื้นที่แนวนอน */
+}
+
+.input-row input {
+  margin-right: 10px; /* เพิ่มระยะห่างขวาของ input */
+  margin: 0 10px; /* กำหนดระยะห่างทั้งซ้ายและขวา */
+}
+
+.input-row input:first-child {
+  margin-left: 10px; /* เพิ่มระยะห่างซ้ายของ input ทางด้านซ้ายสุด */
+}
+
+.input-label {
+  width: 120px; /* กำหนดความกว้างของ label */
+  display: inline-block; /* ให้ label แสดงเป็นบล็อกอิลีเมนต์แบบ inline */
+  margin-right: 10px; /* กำหนดระยะห่างข้างขวาของ label */
+  flex-shrink: 0; /* ป้องกัน label ย่อลงเมื่อพื้นที่ไม่พอ */
+  text-align: right; /* จัดตำแหน่งข้อความใน label ไว้ทางขวา */
+  font-size: 18px; /* กำหนดขนาดตัวหนังสือใน label */
+  font-weight: bold; /* กำหนดหนาของตัวหนังสือใน label */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between; /* จัดเว้นระยะห่างระหว่างปุ่ม */
+  align-items: center; /* จัดให้ปุ่มอยู่ตรงกลางแนวตั้ง */
+  width: 100%; /* กำหนดความกว้างเท่ากับ container */
+  margin-top: 20px; /* กำหนดระยะห่างข้างบน */
+}
+
+.save-button,
+.delete-button {
+  width: calc(50% - 5px); /* กำหนดความกว้างของปุ่มให้เท่ากับครึ่งหนึ่งของความกว้าง container และห่างกันด้วยระยะห่าง 5px */
+}
+
+.delete-button {
+  background-color: #ff5959; /* กำหนดสีแดง */
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #e24343; /* สีเมื่อเมาส์อยู่ด้านบน */
+}
+
+/* CSS สำหรับ Modal */
+.react-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  width: 300px; /* ปรับขนาดกว้างของ Modal */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center; /* เพิ่มสไตล์นี้เพื่อให้เนื้อหาอยู่ตรงกลางแนวนอน */
+}
+
+/* CSS สำหรับปุ่มใน Modal */
+.react-modal button {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%; /* ทำให้ปุ่มกว้างเท่ากับเนื้อหาภายใน Modal */
+}
+
+/* CSS สำหรับปุ่ม Delete */
+.react-modal button.delete {
+  background-color: red;
+  color: white;
+}
+
+/* CSS สำหรับปุ่ม Cancel */
+.react-modal button.cancel {
+  background-color: gray;
+  color: white;
+}
+
+.double-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 10px
+}
+
+/* CSS สำหรับปรับสไตล์ data1 */
+.double-column.data1 {
+  flex: 0.3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.file-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 2px solid #ccc; /* เปลี่ยนจาก dashed เป็น solid */
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  height: 270px;
+  width: 300px;
+  overflow: hidden;
+  border-radius: 20px; /* เพิ่มความโค้งของเส้นขอบ */
+}
+
+.file-input-container:hover {
+  border-color: #04AA6D;
+}
+
+.file-input-container img {
+  max-width: 100%;
+  max-height: 100%; /* ใช้สูงสุดเพื่อรักษาอัตราส่วน */
+  object-fit: contain;
+  margin-top: 10px;
+}
+
+.file-input-text {
+  margin-top: 10px;
+  color: #646cff;
+  font-size: 14px;
+}
+
+.column.full-width {
+  flex: 2;
+}
+
+.row.grid-container {
+  display: flex;
+  justify-content: center; /* เพิ่มส่วนนี้ */
+  width: 100%;
+}
+
+/* เพิ่มสไตล์สำหรับแสดงผลในรูปแบบ Grid */
+.grid-container {
   display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
   place-items: center;
-  min-height: 100vh; /* ให้คอนเทนเนอร์มีความสูงเท่ากับหน้าจอ */
+  padding: 30px;
+  justify-content: center; /* เพิ่มส่วนนี้ */
 }
 
-/* ยืดเนื้อหาใน container เต็มความกว้าง */
-.container.center > * {
-  width: 100%;
-  max-width: 800px; /* ตัวอย่าง: กำหนดความกว้างสูงสุดของเนื้อหา */
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* จัดตำแหน่งแนวตั้งตรงกลาง */
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  border: 2px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 15px;
+  transition: border-color 0.3s ease;
+  width: 240px;
+  height: 380px;
 }
 
-/* กำหนดให้ input มีความกว้างเต็มความกว้างของ container */
-.container.center input {
+.grid-item:hover {
+  border-color: #04AA6D; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
+}
+
+.grid-item img {
+  width: 1000px; /* กำหนดความกว้างของรูปภาพ */
+  height: 1500px; /* กำหนดความสูงของรูปภาพ */
+  object-fit: contain; /* รูปภาพจะแสดงตามขนานที่กำหนดโดยไม่เปลี่ยนสัดส่วนหรือตัดขอบ */
+}
+
+.grid-item p {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* เพิ่มสไตล์สำหรับเส้นแบ่งด้านล่าง */
+.divider {
   width: 100%;
-  box-sizing: border-box; /* รวม padding และ border ในความกว้าง */
+  height: 1.5px;
+  background-color: #ccc;
+  margin-top: 20px; /* กำหนดระยะห่างของเส้นแบ่ง */
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
-
-/* button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-} */
 
 /* CSS สำหรับปรับขนาดและการแสดงผลของรูปภาพ */
 img {
@@ -122,7 +307,6 @@ button {
 button:hover {
   background-color: #038d59;
 }
-
 
 @media (prefers-color-scheme: light) {
   :root {
