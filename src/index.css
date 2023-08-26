@@ -81,16 +81,15 @@ a:hover {
 }
 
 .input-label {
-  width: 120px; /* กำหนดความกว้างของ label */
-  display: inline-block; /* ให้ label แสดงเป็นบล็อกอิลีเมนต์แบบ inline */
-  margin-right: 10px; /* กำหนดระยะห่างข้างขวาของ label */
-  flex-shrink: 0; /* ป้องกัน label ย่อลงเมื่อพื้นที่ไม่พอ */
-  text-align: right; /* จัดตำแหน่งข้อความใน label ไว้ทางขวา */
-  font-size: 18px; /* กำหนดขนาดตัวหนังสือใน label */
-  font-weight: bold; /* กำหนดหนาของตัวหนังสือใน label */
+  width: 120px;
+  display: inline-block;
+  margin-right: 10px;
+  flex-shrink: 0;
+  font-size: 18px;
+  font-weight: bold;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start; /* เปลี่ยนจาก flex-end เป็น flex-start */
 }
 
 .button-row {
@@ -178,6 +177,40 @@ a:hover {
   box-sizing: border-box;
 }
 
+.double-column .input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.double-column .input-row label {
+  flex: 0 0 9%;
+  padding-left: 10px;
+  font-size: 18px;
+}
+
+.double-column .input-row input,
+.double-column .input-row textarea {
+  flex: 1; /* กำหนดให้ input หรือ textarea ขยายเต็มพื้นที่ที่เหลือ */
+  padding: 8px;
+  margin: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 18px; /* ปรับขนาดตัวหนังสือใน label ใหญ่ขึ้น */
+}
+
+/* CSS สำหรับปรับระยะห่างและการจัดชิดซ้ายของแต่ละ checkbox */
+.checkbox {
+  display: flex;
+  align-items: center;
+  margin-right: 10px; /* เพิ่มระยะห่างขวาของ label สำหรับช่อง checkbox */
+}
+
+.checkbox input {
+  margin-right: 5px; /* เพิ่มระยะห่างขวาของช่อง checkbox */
+}
+
+
 .file-input-container {
   display: flex;
   align-items: center;
@@ -205,9 +238,10 @@ a:hover {
 }
 
 .file-input-text {
-  margin-top: 10px;
+  font-size: 18px; /* ปรับขนาดตัวอักษรให้ใหญ่ขึ้น */
+  font-weight: bold; /* ตั้งตัวหนังสือให้ตัวหนา */
   color: #646cff;
-  font-size: 14px;
+  margin-top: 10px;
 }
 
 .column.full-width {
@@ -247,6 +281,7 @@ a:hover {
 
 .grid-item:hover {
   border-color: #04AA6D; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
+  color: #04AA6D; /* เปลี่ยนสีตัวอักษรเมื่อเมาส์อยู่ด้านบน */
 }
 
 .grid-item img {
