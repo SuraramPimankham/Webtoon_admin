@@ -3,6 +3,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getDocs, setDoc, doc, collection } from 'firebase/firestore';
 import { db, storage } from '../firebase';
 import { Link } from 'react-router-dom';
+import Modal from 'react-modal'; // นำเข้า Modal โดยไม่ใช้ curly braces
+
+Modal.setAppElement('#root');
 
 function AddStory() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -11,7 +14,10 @@ function AddStory() {
   const [description, setDescription] = useState('');
   const [author, setAuthor] = useState('');
   const [categories, setCategories] = useState([]); // State เพื่อเก็บข้อมูล categories
+  const [day, setDay] = useState('');
 
+  const [modalIsOpen, setModalIsOpen] = useState(false); // State สำหรับเปิด/ปิด modal
+  const [missingFields, setMissingFields] = useState([]); // เพิ่ม state สำหรับ missingFields
   const inputRef = useRef(null); // สร้าง ref สำหรับ input
 
   const handleFileChange = (event) => {
@@ -20,33 +26,45 @@ function AddStory() {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !fileId || !title || categories.length === 0 || !description || !author) {
-      console.error('Please fill in all fields.');
+    const missingFields = [];
+  
+    if (!selectedFile) missingFields.push("Image");
+    if (!fileId) missingFields.push("ID");
+    if (!title) missingFields.push("Title");
+    if (categories.length === 0) missingFields.push("Category");
+    if (!description) missingFields.push("Description");
+    if (!author) missingFields.push("Author");
+    if (!day) missingFields.push("Day");
+  
+    if (missingFields.length > 0) {
+      setMissingFields(missingFields); // ตั้งค่า missingFields
+      setModalIsOpen(true);
       return;
     }
-
+  
     const storageRef = ref(storage, `img_storys/${title}`);
-
+  
     try {
       const snapshot = await uploadBytes(storageRef, selectedFile);
       const imageUrl = await getDownloadURL(snapshot.ref);
-
+  
       await setDoc(doc(db, 'storys', fileId), {
         id: fileId,
         title: title,
         categories: categories,
         description: description,
         imageUrl: imageUrl,
-        author: author
+        author: author,
+        day: day
       });
-
+  
       console.log('Data uploaded successfully. Document ID:', fileId);
       window.location.reload();
     } catch (error) {
       console.error('Error uploading data:', error);
     }
   };
-
+  
   const fetchStories = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'storys'));
@@ -66,7 +84,6 @@ function AddStory() {
       setCategories([...categories, selectedCategory]);
     }
   };
-  
 
   useEffect(() => {
     fetchStories();
@@ -114,6 +131,23 @@ function AddStory() {
             />
           </div>
           <div className="input-row">
+          <label htmlFor="dropdown" className="label">Day</label>
+            <select
+              id="dropdown"
+              name="dropdown"
+              className="custom-dropdown"
+              value={day}
+              onChange={(e) => setDay(e.target.value)} // เพิ่มการเซ็ตค่า day จากการเลือก dropdown
+            >
+              <option value=""></option>
+              <option value="sunday">Sunday</option>
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+            </select>
             <label className="label">Category</label>
             <label className="checkbox">
               <input
@@ -167,6 +201,24 @@ function AddStory() {
             />
           </div>
           <button onClick={handleUpload}>UPLOAD</button>
+          {/* ส่วนของ Modal */}
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={() => setModalIsOpen(false)}
+            contentLabel="Incomplete Data Alert"
+            className="custom-modal" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ Modal
+            overlayClassName="custom-overlay" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ overlay
+          >
+            <div className="modal-content">
+              <h2>Please fill in the following fields</h2>
+              <ul>
+                {missingFields.map((field, index) => (
+                  <li key={index}>{field}</li>
+                ))}
+              </ul>
+              <button onClick={() => setModalIsOpen(false)}>Close</button>
+            </div>
+          </Modal>
         </div>
       </div>
       <div className="divider"></div>

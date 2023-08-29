@@ -1,216 +1,140 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { ref, deleteObject, uploadBytes } from 'firebase/storage';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
 
 import Modal from 'react-modal';
 
-import { db } from '../firebase';
-import { storage } from '../firebase';
+import { db, storage } from '../firebase';
 
 Modal.setAppElement('#root');
 
 function StoryDetail() {
-  const { id } = useParams();
-
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageName, setImageName] = useState('');
-  const [imageNameNew, setImageNameNew] = useState('');
-  const [author, setAuthor] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-
-  const inputRef = useRef(null);
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { id } = useParams(); // รับ id ที่ส่งมาจาก URL
 
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fileId, setFileId] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [author, setAuthor] = useState('');
+  const [categories, setCategories] = useState([]); // State เพื่อเก็บข้อมูล categories
+  const [day, setDay] = useState('');
+
+  const [storyData, setStoryData] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchStoryData = async () => {
-      const storyDocRef = doc(db, 'storys', id);
-      const storyDocSnap = await getDoc(storyDocRef);
-      if (storyDocSnap.exists()) {
-        const storyData = storyDocSnap.data();
-        setTitle(storyData.title);
-        setCategory(storyData.category);
-        setDescription(storyData.description);
-        setImageName(storyData.image_name);
-        setImageNameNew(storyData.image_name);
-        setAuthor(storyData.author);
-        setImageUrl(storyData.imageUrl);
+      try {
+        const docRef = doc(db, 'storys', id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setStoryData(data);
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+        console.error('Error fetching story data:', error);
       }
     };
 
     fetchStoryData();
   }, [id]);
 
-  const handleImageChange = (event) => {
-    const selectedFile = event.target.files[0];
-  
-    if (selectedFile) {
-      setImageUrl(URL.createObjectURL(selectedFile));
-      setSelectedFile(selectedFile);
-      setImageNameNew(selectedFile.name);
-    }
-  };
-  
-  const handleSave = async () => {
-    try {
-      const storyDocRef = doc(db, 'storys', id);
-  
-      // ลบรูปเก่าจาก Storage ก่อน (ถ้ามีการเปลี่ยน imageName)
-      if (imageName !== imageNameNew) {
-        const oldStorageRef = ref(storage, 'img_storys/' + imageName);
-        await deleteObject(oldStorageRef);
-      }
-  
-      // อัปโหลดรูปใหม่ (ถ้ามีการเลือกรูปใหม่)
-      if (selectedFile) {
-        const newStorageRef = ref(storage, 'img_storys/' + imageNameNew);
-        await uploadBytes(newStorageRef, selectedFile);
-      } else {
-        // ใช้ imageUrl เดิมเพื่ออัปเดตชื่อรูปใน Firestore
-        const newStorageRef = ref(storage, 'img_storys/' + imageUrl.split('/').pop());
-        await deleteObject(newStorageRef);
-        await uploadBytes(newStorageRef, selectedFile);
-      }
-  
-      // บันทึกข้อมูลใหม่
-      await updateDoc(storyDocRef, {
-        title: title,
-        category: category,
-        description: description,
-        image_name: imageNameNew,
-        author: author,
-        imageUrl: selectedFile ? imageUrl : imageUrl
-      });
-  
-      console.log('Data and image updated successfully.');
-    } catch (error) {
-      console.error('Error updating data:', error);
-    }
-  };
-  
-  const openDeleteModal = () => {
-    setIsDeleteModalOpen(true);
-  };
-
-  const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-  };
-
   const handleDelete = async () => {
-    openDeleteModal();
-  };
-
-  const confirmDelete = async () => {
     try {
-      const storyDocRef = doc(db, 'storys', id);
-      await deleteDoc(storyDocRef);
-  
-      console.log('Data and image deleted successfully.');
-      window.location.href = '/add-story';
+      // Delete data from Firestore
+      await deleteDoc(doc(db, 'storys', id));
+
+      // Delete image from Storage
+      const storageRef = ref(storage, `img_storys/${storyData.title}`);
+      await deleteObject(storageRef);
+
+      console.log('Story deleted successfully.');
+      // Redirect or update UI accordingly
     } catch (error) {
-      console.error('Error deleting data:', error);
+      console.error('Error deleting story:', error);
     }
   };
-  
+
   return (
+    
     <div className="container center">
-      <div className="row">
-        <div className="double-column data1">
-        <div className="file-input-container" onClick={() => inputRef.current.click()}>
-          {selectedFile ? (
-            <img src={URL.createObjectURL(selectedFile)} alt="Selected" />
-          ) : imageUrl ? (
-            <img src={imageUrl} alt="Previous" />
-          ) : (
-            <p className="file-input-text">Click to select image.</p>
-          )}
-        </div>
-          <input
-            type="file"
-            style={{ display: 'none' }}
-            onChange={handleImageChange}
-            ref={inputRef}
-          />
-        </div>
-
-        <div className="double-column">
-          <div className="input-row">
-            <label className="input-label">ชื่อเรื่อง:</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <label className="input-label">ผู้แต่ง:</label>
-            <input
-              type="text"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-            />
+      {storyData ? (
+        <div className="row">
+          <div className="double-column data1">
+            <img src={storyData.imageUrl} alt={storyData.title} />
           </div>
-          <div className="input-row">
-            <label className="input-label">หมวดหมู่:</label>
-            <input
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-            <label className="input-label">คำอธิบาย:</label>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <div className="input-row">
-            <label className="input-label">ชื่อรูปภาพ:</label>
-            <input
-              type="text"
-              value={imageNameNew}
-              onChange={(e) => setImageNameNew(e.target.value)}
-            />
-          </div>
-          <div className="button-row">
-            <button className="save-button" onClick={handleSave}>
-              บันทึก
-            </button>
-            <button className="delete-button" onClick={handleDelete}>
-              ลบ
-            </button>
-          </div>
-        </div>
-
-        <Modal
-        isOpen={isDeleteModalOpen}
-        onRequestClose={closeDeleteModal}
-        contentLabel="Delete Modal"
-        className="react-modal"
-        >
-          <h2 style={{ color: 'black'}}>ยืนยันการลบ</h2>
-          <p style={{ color: 'black'}}>คุณแน่ใจหรือไม่ที่จะลบเรื่องนี้?</p>
-          <button className="delete" onClick={confirmDelete}>
-            ลบ
-          </button>
-          <button className="cancel" onClick={closeDeleteModal}>
-            ยกเลิก
-          </button>
-        </Modal>
-
-      </div>
-
-      <div className="divider"></div>
-
-        <div className="row grid-container">
-            <div className="grid-container">
-                <div className="grid-item"><h1>+</h1></div>
+          <div className="double-column">
+            <div className="input-row">
+              <label htmlFor="fileId" className="label">ID</label>
+              <input
+                type="text"
+                value={fileId || storyData.id} // ใช้ fileId ถ้ามีค่า ถ้าไม่ใช้ storyData.id จาก Firebase
+                onChange={(e) => setFileId(e.target.value)}
+              />
             </div>
-        </div>
+            <div className="input-row">
+              <label htmlFor="title" className="label">Title</label>
+                <input
+                  type="text"
+                  value={title || storyData.title} // ใช้ title ถ้ามีค่า ถ้าไม่ใช้ storyData.title จาก Firebase
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              <label htmlFor="author" className="label">Author</label>
+              <input
+                type="text"
+                value={author || storyData.author}
+                onChange={(e) => setAuthor(e.target.value)}
+              />
+            </div>
+            <div className="input-row">
+              <label htmlFor="dropdown" className="label">Day</label>
+              <select
+                id="dropdown"
+                name="dropdown"
+                className="custom-dropdown"
+                value={day || storyData.day}
+                onChange={(e) => setDay(e.target.value)}
+              >
+                <option value=""></option>
+                <option value="sunday">Sunday</option>
+                <option value="monday">Monday</option>
+                <option value="tuesday">Tuesday</option>
+                <option value="wednesday">Wednesday</option>
+                <option value="thursday">Thursday</option>
+                <option value="friday">Friday</option>
+                <option value="saturday">Saturday</option>
+              </select>
+              <label className="label">Category</label>
+            </div>
+            <div className="input-row">
+              <label htmlFor="description" className="label">Description</label>
+              <p>{storyData.description}</p>
+            </div>
+            <div className="input-row">
+              <button onClick={() => setModalIsOpen(true)}>Delete Story</button>
+              <button onClick={() => setModalIsOpen(true)}>Delete Story</button>
+            </div>
 
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={() => setModalIsOpen(false)}
+              contentLabel="Delete Confirmation"
+            >
+              <div>
+                <p>Are you sure you want to delete this story?</p>
+                <button onClick={handleDelete}>Delete</button>
+                <button onClick={() => setModalIsOpen(false)}>Cancel</button>
+              </div>
+            </Modal>
+          </div>
+        </div>
+      ) : (
+        <p>Loading story data...</p>
+      )}
     </div>
   );
 }

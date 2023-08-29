@@ -135,26 +135,29 @@ a:hover {
 }
 
 /* CSS สำหรับปุ่มใน Modal */
-.react-modal button {
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%; /* ทำให้ปุ่มกว้างเท่ากับเนื้อหาภายใน Modal */
+/* ปรับแต่งสไตล์ของ Modal */
+.custom-modal {
+  position: fixed; /* ใช้ fixed เพื่อให้ Modal ตรงกลางหน้าจอ */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.95); /* ทำให้พื้นหลังของ Modal เบลอ */
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* CSS สำหรับปุ่ม Delete */
-.react-modal button.delete {
-  background-color: red;
-  color: white;
+/* ปรับแต่งสไตล์ของ overlay */
+.custom-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* CSS สำหรับปุ่ม Cancel */
-.react-modal button.cancel {
-  background-color: gray;
-  color: white;
+/* ปรับแต่งสไตล์ของเนื้อหาใน Modal */
+.modal-content {
+  padding: 20px;
+  color: #000000;
 }
+
 
 .double-column {
   flex: 1;
@@ -203,13 +206,13 @@ a:hover {
 .checkbox {
   display: flex;
   align-items: center;
-  margin-right: 10px; /* เพิ่มระยะห่างขวาของ label สำหรับช่อง checkbox */
+  padding: 8px;
+  margin: 4px;
 }
 
 .checkbox input {
   margin-right: 5px; /* เพิ่มระยะห่างขวาของช่อง checkbox */
 }
-
 
 .file-input-container {
   display: flex;
@@ -220,14 +223,14 @@ a:hover {
   padding: 20px;
   cursor: pointer;
   transition: border-color 0.3s ease;
-  height: 270px;
+  height: 315px;
   width: 300px;
   overflow: hidden;
   border-radius: 20px; /* เพิ่มความโค้งของเส้นขอบ */
 }
 
 .file-input-container:hover {
-  border-color: #04AA6D;
+  border-color: #ff1493;
 }
 
 .file-input-container img {
@@ -240,7 +243,7 @@ a:hover {
 .file-input-text {
   font-size: 18px; /* ปรับขนาดตัวอักษรให้ใหญ่ขึ้น */
   font-weight: bold; /* ตั้งตัวหนังสือให้ตัวหนา */
-  color: #646cff;
+  color: #ffffff;
   margin-top: 10px;
 }
 
@@ -280,8 +283,8 @@ a:hover {
 }
 
 .grid-item:hover {
-  border-color: #04AA6D; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
-  color: #04AA6D; /* เปลี่ยนสีตัวอักษรเมื่อเมาส์อยู่ด้านบน */
+  border-color: #ff1493; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
+  color: #ff1493; /* เปลี่ยนสีตัวอักษรเมื่อเมาส์อยู่ด้านบน */
 }
 
 .grid-item img {
@@ -293,6 +296,23 @@ a:hover {
 .grid-item p {
   margin-top: 10px;
   font-size: 16px;
+}
+
+/* เพิ่มสไตล์สำหรับ dropdown ที่คุณสร้าง */
+.custom-dropdown {
+  width: 100%; /* กำหนดความกว้างเท่ากับพื้นที่ที่ใช้ได้ */
+  height: 40px; /* ปรับความสูงของ dropdown */
+  font-size: 16px; /* ปรับขนาดตัวหนังสือใน dropdown */
+  border: 1px solid #ccc; /* กำหนดเส้นขอบ */
+  border-radius: 4px; /* กำหนดการโค้งของมุม */
+  padding: 8px;
+  margin: 4px;
+}
+
+/* เพิ่มสไตล์สำหรับ label ของ dropdown */
+.dropdown-label {
+  font-size: 18px; /* ปรับขนาดตัวอักษรใน label */
+  margin-right: 10px; /* กำหนดระยะห่างขวาของ label */
 }
 
 /* เพิ่มสไตล์สำหรับเส้นแบ่งด้านล่าง */
@@ -329,7 +349,7 @@ button {
 
 /* CSS สำหรับปรับสีพื้นหลังและขนาดของ button */
 button {
-  background-color: #04AA6D;
+  background-color: #ff1493;
   color: white;
   cursor: pointer;
   font-size: 18px;
@@ -340,7 +360,7 @@ button {
 }
 
 button:hover {
-  background-color: #038d59;
+  background-color:	#d01076;
 }
 
 @media (prefers-color-scheme: light) {
