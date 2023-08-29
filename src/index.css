@@ -63,6 +63,33 @@ a:hover {
   width: 100%;
 }
 
+.input-row-model {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* จัดแนวตรงกลาง */
+  width: 100%;
+  margin-bottom: 20px; /* กำหนดระยะห่างของแถว */
+  flex: 1; /* ทำให้เต็มพื้นที่แนวนอน */
+}
+
+.input-row-model input {
+  margin-right: 10px;
+  margin: 0 10px;
+  background-color: #f9f9f9;
+  color: #000000;
+}
+
+.input-row-model label {
+  display: block; /* ทำให้ label เป็น element แบบ block เพื่อให้สามารถปรับความสูงได้ */
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 5px; /* เพิ่มระยะห่างด้านล่างของ label */
+}
+
+.input-row-model input:first-child {
+  margin-left: 10px; /* เพิ่มระยะห่างซ้ายของ input ทางด้านซ้ายสุด */
+}
+
 .input-row {
   display: flex;
   justify-content: center; /* จัดแนวตรงกลาง */
@@ -122,6 +149,28 @@ a:hover {
   background-color: #b42828; /* สีเมื่อเมาส์อยู่ด้านบน */
 }
 
+.add-button,
+.cancel-button {
+  width: calc(50% - 5px); /* กำหนดความกว้างของปุ่มให้เท่ากับครึ่งหนึ่งของความกว้าง container และห่างกันด้วยระยะห่าง 5px */
+  margin-left: 10px; /* ปรับระยะห่างของปุ่ม Delete จากปุ่ม Cancel */
+  margin-right: 10px
+}
+
+.cancel-button {
+  background-color: #ff6e6e; /* กำหนดสีแดง */
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+  background-color: #b42828; /* สีเมื่อเมาส์อยู่ด้านบน */
+}
+
 /* CSS สำหรับ Modal */
 .react-modal {
   position: fixed;
@@ -156,10 +205,20 @@ a:hover {
 
 /* ปรับแต่งสไตล์ของเนื้อหาใน Modal */
 .modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* จัดตำแหน่งแนวนอนกลาง */
+  justify-content: center; /* จัดตำแหน่งแนวตั้งกลาง */
+  text-align: center; /* จัดข้อความอยู่กลาง */
   padding: 20px;
   color: #000000;
 }
 
+.modal-content h2 {
+  margin-top: 2.5px; /* เพิ่มหรือลดระยะห่างด้านบนของ <h2> */
+  margin-bottom: 2.5px; /* เพิ่มหรือลดระยะห่างด้านล่างของ <h2> */
+  font-size: 30px; /* ปรับขนาดตัวอักษรใน <h2> ตามต้องการ */
+}
 
 .double-column {
   flex: 1;
@@ -217,18 +276,23 @@ a:hover {
 }
 
 .img-input-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  border: 2px solid #ccc; /* เปลี่ยนจาก dashed เป็น solid */
+  margin: 20px 0;
+  cursor: pointer;
+  border: 2px solid #121212;
   padding: 20px;
   cursor: pointer;
   transition: border-color 0.3s ease;
   height: 315px;
   width: 300px;
   overflow: hidden;
-  border-radius: 20px; /* เพิ่มความโค้งของเส้นขอบ */
+  border-radius: 20px;
+  display: flex; /* เพิ่มคุณสมบัตินี้เพื่อใช้ Flexbox */
+  justify-content: center; /* จัดตำแหน่งแนวนอนกลาง */
+  align-items: center; /* จัดตำแหน่งแนวตั้งกลาง */
+}
+
+.img-input-container p {
+  color: black;
 }
 
 .file-input-container {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { doc, getDoc, deleteDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import Modal from 'react-modal';
 import { db, storage } from '../firebase';
@@ -12,7 +12,9 @@ function StoryDetail() {
   const inputRef = useRef(null);
 
   const [storyData, setStoryData] = useState({});
+  const [gridData, setGridData] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileId, setFileId] = useState('');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -22,12 +24,14 @@ function StoryDetail() {
   const [addModalIsOpen, setAddModalIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
 
+  const [ep, setEp] = useState('');
+
   useEffect(() => {
     const fetchStoryData = async () => {
       try {
         const docRef = doc(db, 'storys', id);
         const docSnap = await getDoc(docRef);
-
+  
         if (docSnap.exists()) {
           const data = docSnap.data();
           setStoryData(data);
@@ -37,15 +41,22 @@ function StoryDetail() {
           setAuthor(data.author || '');
           setDay(data.day || '');
           setDescription(data.description || '');
-          
         } else {
           console.log('No such document!');
         }
+  
+        // ดึงข้อมูลจาก collection storys_ep
+        const epCollectionRef = collection(db, id);
+        const epCollectionSnapshot = await getDocs(epCollectionRef);
+        const epCollectionData = epCollectionSnapshot.docs.map(doc => doc.data());
+  
+        // อัปเดต state ของ gridData เพื่อแสดงข้อมูลใน grid-container
+        setGridData(epCollectionData);
       } catch (error) {
         console.error('Error fetching story data:', error);
       }
     };
-
+  
     fetchStoryData();
   }, [id]);
 
@@ -53,6 +64,12 @@ function StoryDetail() {
     const file = e.target.files[0];
     setSelectedFile(file);
   };
+
+  function handleFileChanges(event) {
+    const files = event.target.files;
+    const filesArray = Array.from(files);
+    setSelectedFiles(filesArray);
+  }
 
   const handleDelete = async () => {
     try {
@@ -129,18 +146,40 @@ function StoryDetail() {
   
   const handleAddModalClose = () => {
     setAddModalIsOpen(false);
+    setSelectedFiles([]);
     setFileId(''); // รีเซ็ตค่า fileId เมื่อปิด Modal
+    setEp(''); // รีเซ็ตค่า fileId เมื่อปิด Modal
   };
-  
+
   const handleAdd = async () => {
     try {
-      // ดำเนินการเพิ่มเรื่องใหม่ลงใน Firebase หรือทำงานอื่น ๆ ที่คุณต้องการ
-      console.log('New story added successfully.');
+      // บันทึกรูปทั้งหมดที่เลือกไปเก็บใน storage
+      const storagePromises = selectedFiles.map(async (file, index) => {
+        const storageRef = ref(storage, `${title}/ep${ep}/${index + 1}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        return downloadURL;
+      });
+  
+      const imageURLs = await Promise.all(storagePromises);
+  
+      // สร้างข้อมูลที่ต้องบันทึกใน Firebase Database
+      const newData = {
+        id: id,
+        ep: ep,
+        images: imageURLs,
+      };
+  
+      // บันทึกข้อมูลลงใน Firebase Database
+      await setDoc(doc(db, id, `${title} EP ${ep}`), newData);
+  
+      console.log('New EP added successfully.');
       handleAddModalClose(); // ปิด Modal เมื่อเสร็จสิ้น
     } catch (error) {
-      console.error('Error adding new story:', error);
+      console.error('Error adding new EP:', error);
     }
   };
+  
   
   return (
     
@@ -290,37 +329,52 @@ function StoryDetail() {
             <div className="grid-item-add" onClick={() => handleAddClick(id)}>
               <h2>+</h2>
             </div>
+            {gridData.map((item, index) => (
+              <div className="grid-item" key={index}>
+                <p>{item.ep}</p>
+                {/* แสดงข้อมูลในแต่ละ grid-item */}
+              </div>
+            ))}
           </div>
       </div>
 
       <Modal
         isOpen={addModalIsOpen}
         onRequestClose={handleAddModalClose}
-        contentLabel="Add New Story"
+        contentLabel="Add New EP"
         className="custom-modal" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ Modal
         overlayClassName="custom-overlay" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ overlay
       >
         <div className="modal-content">
+          <h2>Add EP</h2>
           <div className="img-input-container" onClick={() => inputRef.current.click()}>
-            {selectedFile ? (
-              <img src={URL.createObjectURL(selectedFile)} alt="Selected" />
+            {selectedFiles.length > 0 ? (
+              <p className="file-input-text">{selectedFiles.length} Images selected</p>
             ) : (
-              <p className="file-input-text">Click to select Image</p>
+              <p className="file-input-text">Click to select file Images</p>
             )}
           </div>
           <input
             type="file"
             ref={inputRef}
             style={{ display: 'none' }}
-            onChange={handleFileChange}
+            onChange={handleFileChanges}
+            multiple // เพิ่ม attribute multiple เพื่ออนุญาตให้เลือกรูปหลายรูปพร้อมกัน
           />
-          <div className="input-row">
+          <div className="input-row-model">
+            <label htmlFor="">EP</label>
+            <input
+              type="text"
+              value={ep}
+              onChange={(e) => setEp(e.target.value)}
+            />
+          </div>
+          <div className="input-row-model">
             <button className="add-button" onClick={handleAdd}>Add</button>
             <button className="cancel-button" onClick={handleAddModalClose}>Cancel</button>
           </div>
         </div>
       </Modal>
-
 
     </div>
     
