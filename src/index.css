@@ -103,10 +103,12 @@ a:hover {
 .save-button,
 .delete-button {
   width: calc(50% - 5px); /* กำหนดความกว้างของปุ่มให้เท่ากับครึ่งหนึ่งของความกว้าง container และห่างกันด้วยระยะห่าง 5px */
+  margin-left: 10px; /* ปรับระยะห่างของปุ่ม Delete จากปุ่ม Cancel */
+  margin-right: 10px
 }
 
 .delete-button {
-  background-color: #ff5959; /* กำหนดสีแดง */
+  background-color: #ff6e6e; /* กำหนดสีแดง */
   color: white;
   cursor: pointer;
   font-size: 18px;
@@ -117,7 +119,7 @@ a:hover {
 }
 
 .delete-button:hover {
-  background-color: #e24343; /* สีเมื่อเมาส์อยู่ด้านบน */
+  background-color: #b42828; /* สีเมื่อเมาส์อยู่ด้านบน */
 }
 
 /* CSS สำหรับ Modal */
@@ -212,6 +214,21 @@ a:hover {
 
 .checkbox input {
   margin-right: 5px; /* เพิ่มระยะห่างขวาของช่อง checkbox */
+}
+
+.img-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 2px solid #ccc; /* เปลี่ยนจาก dashed เป็น solid */
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  height: 315px;
+  width: 300px;
+  overflow: hidden;
+  border-radius: 20px; /* เพิ่มความโค้งของเส้นขอบ */
 }
 
 .file-input-container {

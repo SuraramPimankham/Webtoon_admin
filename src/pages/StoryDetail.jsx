@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, setDoc } from 'firebase/firestore';
-import { ref, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import Modal from 'react-modal';
 import { db, storage } from '../firebase';
 
@@ -19,6 +19,7 @@ function StoryDetail() {
   const [day, setDay] = useState('');
   const [description, setDescription] = useState('');
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [addModalIsOpen, setAddModalIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -58,13 +59,16 @@ function StoryDetail() {
       await deleteDoc(doc(db, 'storys', id));
       const storageRef = ref(storage, `img_storys/${storyData.title}`);
       await deleteObject(storageRef);
-
+  
       console.log('Story deleted successfully.');
-      // Redirect or update UI accordingly
+  
+      // เปลี่ยน URL เพื่อนำผู้ใช้ไปยัง /add-story
+      window.location.href = '/add-story';
     } catch (error) {
       console.error('Error deleting story:', error);
     }
   };
+  
 
   const handleCategoryChange = (selectedCategory) => {
     if (categories.includes(selectedCategory)) {
@@ -73,27 +77,71 @@ function StoryDetail() {
       setCategories([...categories, selectedCategory]);
     }
   };
-
+  
   const handleSave = async () => {
-    const updatedData = {
-      id: fileId,
-      title: title,
-      author: author,
-      day: day,
-      description: description,
-      categories: categories,
-      imageUrl: storyData.imageUrl // ใช้ค่า imageUrl ที่มาจาก Firebase
-    };
-
+    let updatedImageUrl = storyData.imageUrl; // เริ่มต้นให้เป็น imageUrl เดิม
+  
     try {
+      // ถ้ามีการเปลี่ยนชื่อ title
+      if (title !== storyData.title) {
+        // ลบรูปเดิมที่เกี่ยวข้องกับชื่อเดิมออกจาก Firebase storage
+        const existingImageRef = ref(storage, `img_storys/${storyData.title}`);
+        await deleteObject(existingImageRef);
+  
+        if (selectedFile) {
+          // อัปโหลดรูปใหม่ไปยัง Firebase storage
+          const newImageRef = ref(storage, `img_storys/${title}`);
+          const snapshot = await uploadBytes(newImageRef, selectedFile);
+          updatedImageUrl = await getDownloadURL(snapshot.ref);
+        }
+      } else if (selectedFile) {
+        // กรณีไม่มีการเปลี่ยนชื่อเรื่อง แต่มีการเลือกรูปใหม่
+        const newImageRef = ref(storage, `img_storys/${title}`);
+        const snapshot = await uploadBytes(newImageRef, selectedFile);
+        updatedImageUrl = await getDownloadURL(snapshot.ref);
+      }
+  
+      const updatedData = {
+        id: fileId,
+        title: title,
+        author: author,
+        day: day,
+        description: description,
+        categories: categories,
+        imageUrl: updatedImageUrl
+      };
+  
+      // อัปเดตข้อมูลเอกสารด้วยข้อมูลใหม่
       await setDoc(doc(db, 'storys', id), updatedData);
-      console.log('Data updated successfully.');
-      // Redirect or update UI accordingly
+      console.log('Story updated successfully.');
+      // รีเฟรชหน้าเว็บหลังจากการบันทึกข้อมูลเสร็จสิ้น
+      window.location.reload();
+      // ให้เปลี่ยนเส้นทางหรืออัปเดต UI ตามที่เหมาะสม
     } catch (error) {
-      console.error('Error updating data:', error);
+      console.error('Error updating story:', error);
     }
   };
 
+  const handleAddClick = (id) => {
+    setAddModalIsOpen(true);
+    setFileId(id);
+  };
+  
+  const handleAddModalClose = () => {
+    setAddModalIsOpen(false);
+    setFileId(''); // รีเซ็ตค่า fileId เมื่อปิด Modal
+  };
+  
+  const handleAdd = async () => {
+    try {
+      // ดำเนินการเพิ่มเรื่องใหม่ลงใน Firebase หรือทำงานอื่น ๆ ที่คุณต้องการ
+      console.log('New story added successfully.');
+      handleAddModalClose(); // ปิด Modal เมื่อเสร็จสิ้น
+    } catch (error) {
+      console.error('Error adding new story:', error);
+    }
+  };
+  
   return (
     
     <div className="container center">
@@ -102,7 +150,7 @@ function StoryDetail() {
           <div className="double-column data1">
           <div className="file-input-container" onClick={() => inputRef.current.click()}>
             {selectedFile || storyData.imageUrl ? (
-              <img src={selectedFile ? URL.createObjectURL(selectedFile) : storyData.imageUrl} alt="Selected" />
+              <img src={selectedFile ? URL.createObjectURL(selectedFile) : storyData.imageUrl} alt="Image Missing" />
             ) : (
               <p className="file-input-text">Click to select Image</p>
             )}
@@ -211,19 +259,23 @@ function StoryDetail() {
             </div>
 
             <div className="input-row">
-              <button onClick={handleSave}>Save</button>
-              <button onClick={() => setModalIsOpen(true)}>Delete</button>
+              <button className="save-button" onClick={handleSave}>Save</button>
+              <button className="delete-button" onClick={() => setModalIsOpen(true)}>Delete</button>
             </div>
 
             <Modal
               isOpen={modalIsOpen}
               onRequestClose={() => setModalIsOpen(false)}
               contentLabel="Delete Confirmation"
+              className="custom-modal" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ Modal
+              overlayClassName="custom-overlay" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ overlay
             >
-              <div>
+              <div className="modal-content">
                 <p>Are you sure you want to delete this story?</p>
-                <button onClick={handleDelete}>Delete</button>
-                <button onClick={() => setModalIsOpen(false)}>Cancel</button>
+                <div className="input-row">
+                  <button className="delete-button" onClick={handleDelete}>Delete</button>
+                  <button className="save-button" onClick={() => setModalIsOpen(false)}>Cancel</button>
+                </div>
               </div>
             </Modal>
           </div>
@@ -234,32 +286,42 @@ function StoryDetail() {
         <div className="divider"></div>
 
         <div className="row grid-container">
-        <div className="grid-container">
-            <div className="grid-item-add">
+          <div className="grid-container">
+            <div className="grid-item-add" onClick={() => handleAddClick(id)}>
               <h2>+</h2>
             </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-            <div className="grid-item">
-            </div>
-        </div>
+          </div>
       </div>
+
+      <Modal
+        isOpen={addModalIsOpen}
+        onRequestClose={handleAddModalClose}
+        contentLabel="Add New Story"
+        className="custom-modal" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ Modal
+        overlayClassName="custom-overlay" // เพิ่มคลาสสำหรับปรับแต่งสไตล์ของ overlay
+      >
+        <div className="modal-content">
+          <div className="img-input-container" onClick={() => inputRef.current.click()}>
+            {selectedFile ? (
+              <img src={URL.createObjectURL(selectedFile)} alt="Selected" />
+            ) : (
+              <p className="file-input-text">Click to select Image</p>
+            )}
+          </div>
+          <input
+            type="file"
+            ref={inputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <div className="input-row">
+            <button className="add-button" onClick={handleAdd}>Add</button>
+            <button className="cancel-button" onClick={handleAddModalClose}>Cancel</button>
+          </div>
+        </div>
+      </Modal>
+
+
     </div>
     
   );
