@@ -9,10 +9,11 @@ import { db } from './firebase'; // นำเข้าเพื่อใช้�
 
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loggedInUsername, setLoggedInUsername] = useState('');
-  const [isOpenDropdown, setIsOpenDropdown] = useState(false); // เพิ่มสถานะ isOpenDropdown
+  // ตรวจสอบการเข้าสู่ระบบจาก Local Storage เมื่อโหลดหน้าเว็บใหม่
+  const initialLoggedInUsername = localStorage.getItem('loggedInUsername') || '';
+  const [loggedInUsername, setLoggedInUsername] = useState(initialLoggedInUsername);
 
-  
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false); // เพิ่มสถานะ isOpenDropdown
 
   const links = [
     { to: '/', label: 'Home' },
@@ -40,61 +41,78 @@ function App() {
   };
 
   const handleLogoutClick = () => {
-    // ดำเนินการออกจากระบบ (ลบบันทึกการเข้าสู่ระบบ)
-    // และเรียกใช้ onLoginSuccess เพื่อเคลียร์สถานะการเข้าสู่ระบบ
-    setLoggedInUsername('');
-    setIsOpenDropdown(false);
+  // ล้างข้อมูลการเข้าสู่ระบบออกจาก Local Storage
+  localStorage.removeItem('loggedInUsername');
+  
+  // ดำเนินการออกจากระบบ (ลบบันทึกการเข้าสู่ระบบ)
+  // และเรียกใช้ onLoginSuccess เพื่อเคลียร์สถานะการเข้าสู่ระบบ
+  setLoggedInUsername('');
+  setIsOpenDropdown(false);
+
+  // เปลี่ยนเส้นทางไปยังหน้าหลัก
+  setActiveLink('/');
   };
 
   return (
     <BrowserRouter>
       <nav className="topnav" id="myTopnav">
         <div className="left-links">
-          {links.map(link => (
+          <Link
+            to="/"
+            className={activeLink === '/' ? 'active' : ''}
+            onClick={() => setActiveLink('/')}
+          >
+            Home
+          </Link>
+          {loggedInUsername && (
             <Link
-              key={link.to}
-              to={link.to}
-              className={activeLink === link.to ? 'active' : ''}
-              onClick={() => setActiveLink(link.to)}
+              to="/add-story"
+              className={activeLink === '/add-story' ? 'active' : ''}
+              onClick={() => setActiveLink('/add-story')}
             >
-              {link.label}
+              Story
             </Link>
-          ))}
+          )}
         </div>
         <div className="right-links">
           <div className="login-button">
             {loggedInUsername ? (
-                <Link to="#" onClick={handleDropdownClick}>
-                  {loggedInUsername}
-                </Link>
+              <Link to="#" onClick={handleDropdownClick}>
+                {loggedInUsername}
+              </Link>
             ) : (
               <Link to="#" onClick={handleLoginClick}>
                 Login
               </Link>
             )}
-              {isOpenDropdown && (
+            {isOpenDropdown && (
               <div className="dropdown">
-                <a href="#" onClick={handleLogoutClick}>Logout</a>
+                <Link to="/" onClick={handleLogoutClick}>
+                  Logout
+                </Link>
               </div>
             )}
           </div>
         </div>
       </nav>
-
+  
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/add-story" element={<AddStory />} />
+          {loggedInUsername && (
+            <Route path="/add-story" element={<AddStory />} />
+          )}
           <Route path="/story/:id" element={<StoryDetail />} />
         </Routes>
       </div>
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess} // รับค่า onLoginSuccess
+        onLoginSuccess={handleLoginSuccess}
       />
     </BrowserRouter>
   );
+  
 }
 
 export default App;
