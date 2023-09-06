@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import AddStory from './pages/AddStory';
 import StoryDetail from './pages/StoryDetail';
-import LoginModal from './components/LoginModal';
+import LoginModal from './components/loginModal';
+import Error from './pages/Error';
 import './navbar.css';
 import { db } from './firebase'; // นำเข้าเพื่อใช้งาน Firestore
 
@@ -17,7 +18,8 @@ function App() {
 
   const links = [
     { to: '/', label: 'Home' },
-    { to: '/add-story', label: 'Story' }
+    { to: '/add-story', label: 'Story' },
+    { to: '/error'}
   ];
 
   const currentPath = window.location.pathname;
@@ -99,10 +101,17 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          {loggedInUsername && (
+          {loggedInUsername ? (
             <Route path="/add-story" element={<AddStory />} />
-          )}
-          <Route path="/story/:id" element={<StoryDetail />} />
+            ) : (
+              <Route path="/add-story" element={<Navigate to="/error" />} />
+            )}
+            {loggedInUsername ? (
+              <Route path="/story/:id" element={<StoryDetail />} />
+            ) : (
+              <Route path="/story/:id" element={<Navigate to="/error" />} />
+            )}
+          <Route path="/error" element={<Error />} />
         </Routes>
       </div>
       <LoginModal
