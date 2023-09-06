@@ -69,7 +69,7 @@
 /* สไตล์สำหรับ Dropdown จะเหมือนเดิม */
 .dropdown {
   position: absolute;
-  top: 9.5%; /* ขยาย Dropdown ออกไปด้านล่างของ Navbar */
+  top: 9.6%; /* ขยาย Dropdown ออกไปด้านล่างของ Navbar */
   right: 0;
   background-color: #f1f1f1;
   min-width: 120px; /* กำหนดความกว้างของ Dropdown ตามที่คุณต้องการ */

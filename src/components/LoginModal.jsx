@@ -10,10 +10,17 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  // ฟังก์ชันสำหรับรีเซตค่า username และ password
+  const resetForm = () => {
+    setUsername('');
+    setPassword('');
+  };
+
   if (!isOpen) return null;
 
   const handleLogin = async () => {
     const hashedPassword = sha3_512(password); // ใช้ฟังก์ชัน sha3_512 ในการแปลงรหัสผ่าน
+    console.log(username+"\n"+hashedPassword);
   
     try {
       const adminQuery = query(collection(db, 'admins'), where('username', '==', username));
@@ -23,16 +30,20 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
         const adminData = adminQuerySnapshot.docs[0].data();
         if (adminData.password === hashedPassword) {
           console.log('Logged in as:', username);
+          resetForm();
           onLoginSuccess(username); // เรียกใช้งานฟังก์ชัน onLoginSuccess และส่งชื่อผู้ใช้
           onClose();
         } else {
           console.log('Invalid password');
+          resetForm(); // รีเซตค่า username และ password เมื่อเกิดข้อผิดพลาด
         }
       } else {
         console.log('User not found');
+        resetForm(); // รีเซตค่า username และ password เมื่อเกิดข้อผิดพลาด
       }
     } catch (error) {
       console.error('Error logging in:', error);
+      resetForm(); // รีเซตค่า username และ password เมื่อเกิดข้อผิดพลาด
     }
   };
 
@@ -60,7 +71,7 @@ const LoginModal = ({ isOpen, onClose, onLoginSuccess }) => {
           <button className="confirm-button" onClick={handleLogin}>
             Login
           </button>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={() => { onClose(); resetForm(); }}>
             Cancel
           </button>
         </div>
