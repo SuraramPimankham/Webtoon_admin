@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
-import AddStory from './pages/AddStory';
+import AddStory from './pages/Story';
 import StoryDetail from './pages/StoryDetail';
-import LoginModal from './components/loginModal';
 import Error from './pages/Error';
+import LoginModal from './components/loginModal';
 import './navbar.css';
-import { db } from './firebase'; // นำเข้าเพื่อใช้งาน Firestore
+import { db } from './firebase';
 
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -18,7 +18,7 @@ function App() {
 
   const links = [
     { to: '/', label: 'Home' },
-    { to: '/add-story', label: 'Story' },
+    { to: '/story', label: 'Story' },
     { to: '/error'}
   ];
 
@@ -28,6 +28,7 @@ function App() {
   
   const handleLoginClick = () => {
     setIsLoginModalOpen(true);
+
   };
 
   const handleLoginSuccess = (username) => {
@@ -68,9 +69,9 @@ function App() {
           </Link>
           {loggedInUsername && (
             <Link
-              to="/add-story"
-              className={activeLink === '/add-story' ? 'active' : ''}
-              onClick={() => setActiveLink('/add-story')}
+              to="/story"
+              className={activeLink === '/story' || currentPath.startsWith('/story/') ? 'active' : ''}
+              onClick={() => setActiveLink('/story')}
             >
               Story
             </Link>
@@ -102,9 +103,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           {loggedInUsername ? (
-            <Route path="/add-story" element={<AddStory />} />
+            <Route path="/story" element={<AddStory />} />
             ) : (
-              <Route path="/add-story" element={<Navigate to="/error" />} />
+              <Route path="/story" element={<Navigate to="/error" />} />
             )}
             {loggedInUsername ? (
               <Route path="/story/:id" element={<StoryDetail />} />

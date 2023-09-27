@@ -1,0 +1,9 @@
+.home-container{
+    text-align: center; /* จัดเนื้อหาตามแนวนอน (horizontal) ให้อยู่กลาง */
+    margin: 0 auto; /* จัดเนื้อหาตามแนวตั้ง (vertical) ให้อยู่กลาง */
+    font-size: 200%;
+}
+
+.home-container h2 {
+        color: white; 
+}

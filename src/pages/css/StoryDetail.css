@@ -1,0 +1,110 @@
+.grid-item-add {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* จัดตำแหน่งแนวตั้งตรงกลาง */
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    border: 2px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 15px;
+    transition: border-color 0.3s ease;
+    width: 240px;
+    height: 380px;
+  }
+  
+  .grid-item-add:hover {
+    border-color: #ff1493; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
+    color: #ff1493; /* เปลี่ยนสีตัวอักษรเมื่อเมาส์อยู่ด้านบน */
+    cursor: pointer; /* เปลี่ยนรูปแบบของ cursor เมื่อเมาส์วางบน */
+    h2 {
+        color: #ff1493;
+      }
+  }
+
+  .grid-item-add img {
+    width: 1000px; /* กำหนดความกว้างของรูปภาพ */
+    height: 1500px; /* กำหนดความสูงของรูปภาพ */
+    object-fit: contain; /* รูปภาพจะแสดงตามขนานที่กำหนดโดยไม่เปลี่ยนสัดส่วนหรือตัดขอบ */
+  }
+  
+  .grid-item-add h2 {
+    color: #ccc;
+    margin-top: 10px;
+    font-size: 45px;
+  }
+
+.save-button{
+    background-color: #ff1493;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover{
+    background-color: #d01076;
+}
+
+.delete-button{
+    background-color: rgb(255, 75, 66);
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover{
+    background-color: rgb(215, 44, 35);
+}
+
+.grid-item-ep {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* จัดตำแหน่งแนวตั้งตรงกลาง */
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    border: 2px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 15px;
+    transition: border-color 0.3s ease;
+    width: 240px;
+    height: 380px;
+    position: relative; /* ตั้งค่าให้เป็น relative เพื่อให้เป็นตัวพ่อสำหรับสี่เหลี่ยมขาว */
+
+    /* เพิ่มสี่เหลี่ยมขาวที่ขวาบน */
+    &::before {
+        content: 'X'; /* ต้องใช้ content เมื่อใช้ pseudo-element */
+        position: absolute;
+        top: 0px; /* ระยะห่างด้านบน */
+        right: 0px; /* ระยะห่างด้านขวา */
+        width: 40px; /* ความกว้างของสี่เหลี่ยมขาว */
+        height: 40px; /* ความสูงของสี่เหลี่ยมขาว */
+        color: #000;
+        background-color: #ccc; /* สีของสี่เหลี่ยมขาว */
+        border-top-right-radius: 20%; /* ปรับรูปร่างสี่เหลี่ยมขาวตามมุมของ grid-item-ep */
+        border-bottom-left-radius: 20%; /* ปรับรูปร่างสี่เหลี่ยมขาวตามมุมของ grid-item-ep */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold; /* ตั้งค่าข้อความให้เป็นตัวหนา */
+        font-size: 18px; /* ขนาดตัวอักษร */
+        transition: background-color 0.3s ease; /* เพิ่ม transition เพื่อสลับสี */
+      }
+      
+      &:hover::before {
+        color: white;
+        background-color: #ff1493; /* เปลี่ยนสีของสี่เหลี่ยมขาวเมื่อเมาส์วางบน */
+        cursor: pointer; /* เปลี่ยนรูปแบบของ cursor เมื่อเมาส์วางบน */
+      }
+      
+  }
+  
+  .grid-item-ep:hover {
+    border-color: #ff1493; /* เปลี่ยนสีเส้นกรอบเมื่อเมาส์อยู่ด้านบน */
+    color: #ff1493; /* เปลี่ยนสีตัวอักษรเมื่อเมาส์อยู่ด้านบน */
+    h2 {
+        color: #ff1493;
+      }
+  }
+
+  .grid-item-ep img {
+    width: 200px; /* กำหนดความกว้างของรูปภาพ */
+    height: 350px; /* กำหนดความสูงของรูปภาพ */
+    object-fit: contain; /* รูปภาพจะแสดงตามขนานที่กำหนดโดยไม่เปลี่ยนสัดส่วนหรือตัดขอบ */
+  }

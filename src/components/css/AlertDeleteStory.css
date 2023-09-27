@@ -1,0 +1,31 @@
+/* AlertDeleteStory.css */
+
+/* ตั้ง modal อยู่กลางหน้าจอ */
+.custom-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border-radius: 10px; /* เพิ่มขอบโค้งให้กับ custom-modal */
+  }
+  
+  /* ปรับขนาดของ modal-content */
+  .modal-content {
+    width: 400px; /* ปรับขนาดตามที่คุณต้องการ */
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px; /* เพิ่มขอบโค้งให้กับ modal-content */
+  }
+  
+  .yes{
+    background-color: rgb(255, 75, 66);
+    transition: background-color 0.3s ease;
+}
+
+.yes:hover{
+    background-color: rgb(215, 44, 35);
+}

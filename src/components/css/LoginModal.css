@@ -1,3 +1,7 @@
+h2 {
+  color: black;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -12,6 +16,7 @@
   }
   
   .modal-content {
+    width: 20%; /* กำหนดความกว้างเป็น 70% ของความกว้างของหน้าจอ */
     background-color: white;
     border-radius: 8px;
     padding: 20px;
@@ -20,6 +25,7 @@
   }
 
   .input-login {
+    width: 100%; /* กำหนดความกว้างเท่ากับ .modal-content */
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
@@ -60,7 +66,7 @@
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    width: 50%; /* ให้ปุ่ม Login มีครึ่งหนึ่งของความกว้างของปุ่ม */
+    width: 45%; /* ให้ปุ่ม Login มีครึ่งหนึ่งของความกว้างของปุ่ม */
   }
   
   .confirm-button:hover {
@@ -76,8 +82,8 @@
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    width: 50%; /* ให้ปุ่ม Cancel มีครึ่งหนึ่งของความกว้างของปุ่ม */
-    margin-left: auto; /* จัดชิดขวา */
+    width: 45%; /* ให้ปุ่ม Cancel มีความกว้าง 45% */
+    margin-left: 10px; /* เพิ่มระยะห่างด้านซ้ายของปุ่ม Cancel */
   }
   
   .close-button:hover {
