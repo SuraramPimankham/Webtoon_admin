@@ -16,7 +16,7 @@ function AlertInputModal({ modalIsOpen, setModalIsOpen, missingFields }) {
       className="custom-modal"
       overlayClassName="custom-overlay"
     >
-      <div className="modal-content">
+      <div className="modal-content-alert-input">
         <h2>Please fill in the following fields</h2>
         <ul>
           {missingFields.map((field, index) => (

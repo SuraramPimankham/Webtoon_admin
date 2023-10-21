@@ -16,7 +16,7 @@ function AlertDeleteStory({ modalIsOpen, setModalIsOpen, handleDelete }) {
       className="custom-modal"
       overlayClassName="custom-overlay"
     >
-      <div className="modal-content">
+      <div className="modal-content-alert-delete">
         <h2>Are you sure you want to delete this story?</h2>
         <button className='yes' onClick={handleDelete}>Yes</button>
         <button onClick={() => setModalIsOpen(false)}>No</button>
